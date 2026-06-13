@@ -78,110 +78,7 @@ Base vectorial en carpeta local incluida en el repo. SQLite versionable. Configu
 Se creó `scripts/init_memory.py` y se incluyó la base Chroma en el repositorio.  
 Por qué: si la base vectorial se recalcula en cada equipo, los embeddings pueden diferir según versión de modelo. Persistir garantiza reproducibilidad exacta.
 
----
 
-## SESIÓN 2 — Integraciones en producción (Claude Code)
-
-**Sistema:** LogicorpAPI — FastAPI + PostgreSQL en DigitalOcean  
-**Contexto:** Sistema de gestión de flota de transporte, Guatemala
-
----
-
-### P-05 — Migración Twilio → Meta WhatsApp Cloud API
-
-**Prompt:**
-> "Reemplaza la integración de Twilio por Meta WhatsApp Business Cloud API."
-
-**Cambios técnicos:**
-- `whatsapp.py`: nueva función `enviar_template_whatsapp(destino, template_name, variables)` con `httpx` síncrono
-- `config.py`: `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_VERIFY_TOKEN`
-- `GET /whatsapp/webhook`: responde el challenge de verificación de Meta
-- `POST /whatsapp/webhook`: recibe eventos entrantes
-
-**Decisión y por qué:**
-System User Token sobre token temporal del panel.  
-Por qué: el token del panel expira en ~60 días y requiere renovación manual. El System User Token no expira — elimina el riesgo operativo de interrupción del servicio.
-
----
-
-### P-06 — Templates de WhatsApp aprobados por Meta
-
-**Prompt:**
-> "Crea 3 plantillas: alerta de tablet, resumen diario y alerta de visitas."
-
-**Restricción técnica resuelta:**
-Meta rechaza templates con parámetros `{{n}}` al inicio o al final del cuerpo. Se reestructuraron los templates colocando texto literal en los extremos.
-
-**Templates creados:**
-
-| Nombre | Uso | Estado |
-|---|---|---|
-| `logicorp_alerta_tablet` | Desconexión/reconexión de tablets | Activo |
-| `logicorp_resumen_diario` | Resumen diario de agenda | Pausado hasta reimplementar |
-| `logicorp_visitas_alerta` | Módulo de visitas | Pendiente — módulo en desarrollo |
-
-**Decisión y por qué:**
-Código de idioma `"es"` (no `"es_MX"` ni `"es_419"`).  
-Por qué: Meta requiere el código exacto del template al momento de la aprobación. Usar un código distinto al registrado devuelve error 100.
-
----
-
-### P-07 — Alertas operativas de tablets por canal separado
-
-**Prompt:**
-> "Agrega el correo de Don Marvin solo a alertas operativas de tablets, no a correos comerciales."
-
-**Problema técnico identificado:**
-`_enviar_email()` usaba `EMAIL_DESTINOS` globalmente. Agregar a Marvin ahí lo incluiría en resúmenes de marcajes y cotizaciones.
-
-**Cambios técnicos:**
-- `config.py`: nuevo campo `EMAIL_ALERTAS_TABLETS: str = ""`
-- `_enviar_email(asunto, cuerpo, destinos_csv=None)`: parámetro opcional; si se omite usa `EMAIL_DESTINOS`
-- Bloques de tablet en `cron.py` pasan `settings.EMAIL_ALERTAS_TABLETS` explícitamente
-
-**Decisión y por qué:**
-Separación de canales por tipo de audiencia.  
-Por qué: mezclar destinatarios operativos con comerciales genera ruido para ambos grupos y viola el principio de responsabilidad única en la configuración.
-
----
-
-### P-08 — Corrección de bugs en alertas de encendido
-
-**Prompt:**
-> "Las alertas de encendido no llegan. Revisa qué pasó."
-
-**Bugs encontrados:**
-
-| Bug | Consecuencia | Fix |
-|---|---|---|
-| `alerta_desconexion_enviada = False` fuera del `try` | El flag se reseteaba aunque el envío fallara — evento perdido para siempre | Movido dentro del `try` |
-| `except Exception: pass` | Errores silenciosos — imposible diagnosticar fallos | Reemplazado por `logger.error(f"Error alerta encendido {bus_id}: {exc}")` |
-| Response solo devolvía `alertadas` | Sin visibilidad de reconexiones | Agregado `reconectadas` al response |
-
-**Decisión y por qué:**
-El flag de estado solo se modifica si el envío fue exitoso.  
-Por qué: si se resetea antes de confirmar el envío, el sistema pierde el evento permanentemente. Con el fix, el próximo ciclo del cron reintenta automáticamente.
-
----
-
-### P-09 — Corrección de datos en base de datos
-
-**Prompt:**
-> "La placa del bus C-720BPF cambia a C-359BTQ y en el mapa sigue saliendo la vieja."
-
-**Problema técnico:**
-El campo `placa` había sido actualizado en sesión anterior, pero el campo `nombre` — usado por el dashboard para el label del mapa — seguía con el valor antiguo.
-
-```sql
-UPDATE buses SET nombre = 'C-359BTQ' WHERE id = 'BUS-03';
--- placa ya era C-359BTQ, nombre era C-720BPF
-```
-
-**Decisión y por qué:**
-Se actualizaron ambos campos en una sola transacción.  
-Por qué: `nombre` y `placa` pueden divergir si se actualizan independientemente. Se unificaron para que el dashboard, los logs y las alertas de WhatsApp muestren el mismo valor.
-
----
 
 ## Tabla resumen
 
@@ -432,11 +329,6 @@ bash test.sh
 | P-02 | ChatGPT | Ingesta semántica PDFs | Chunking semántico + metadatos | — |
 | P-03 | ChatGPT | Prompt Builder orquestado | Sistema > usuario > documentos | — |
 | P-04 | ChatGPT | Portabilidad total | Repo incluye base vectorial | — |
-| P-05 | Claude Code | Migrar Twilio → Meta API | System User Token | — |
-| P-06 | Claude Code | Crear templates WhatsApp | Texto literal en extremos | — |
-| P-07 | Claude Code | Separar destinatarios | EMAIL_ALERTAS_TABLETS nuevo | — |
-| P-08 | Claude Code | Fix alertas encendido | Flag dentro del try | — |
-| P-09 | Claude Code | Corregir placa dashboard | Actualizar nombre y placa | — |
 | P-10 | Claude Code | Clonar, setup, puerto 8030 | Python stdlib sin dependencias | curl /health → ok, tests 3/3 |
 | P-11 | Claude Code | Generar 5 PDFs académicos | fpdf2 con código real del proyecto | python3 gen_pdfs.py → 5 archivos |
 | P-12 | Claude Code | Evaluar cumplimiento proyecto | Crear PROMPTS.md con historial real | 6/6 tests pasando |
