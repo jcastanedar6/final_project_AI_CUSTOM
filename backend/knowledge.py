@@ -52,22 +52,33 @@ def retrieve_snippets(question, knowledge_base=None, limit=4):
         haystack_terms = _tokenize(_semantic_content(item))
         matches = query_terms & haystack_terms
         if matches:
-            # weight: matched terms / total query terms (recall-like score)
             score = len(matches) / len(query_terms)
             scored.append((score, item))
 
     scored.sort(key=lambda pair: pair[0], reverse=True)
 
-    # Deduplicate: skip chunks whose parent doc is already well-represented
+    if not scored:
+        return []
+
+    top_score = scored[0][0]
+
+    # High-confidence match: return fewer, more focused chunks
+    effective_limit = 2 if top_score >= 0.6 else limit
+    max_per_doc = 1 if top_score >= 0.6 else 2
+    # Drop low-relevance results when a strong match exists
+    min_score = top_score * 0.5
+
     seen_docs = {}
     result = []
     for score, item in scored:
+        if score < min_score:
+            break
         doc = item.get("doc", item["id"])
         count = seen_docs.get(doc, 0)
-        if count < 2:          # max 2 chunks per source document
+        if count < max_per_doc:
             result.append(item)
             seen_docs[doc] = count + 1
-        if len(result) >= limit:
+        if len(result) >= effective_limit:
             break
 
     return result

@@ -1,6 +1,16 @@
 from backend.cag import apply_context
 from backend.knowledge import retrieve_snippets
 
+_CHUNK_MAX_CHARS = 500
+
+
+def _focused_content(content, max_chars=_CHUNK_MAX_CHARS):
+    """Return the first coherent prose block up to max_chars."""
+    if len(content) <= max_chars:
+        return content
+    cutoff = content.rfind(".", 0, max_chars)
+    return content[: cutoff + 1] if cutoff > 0 else content[:max_chars]
+
 
 def answer_question(user_id, question, context_items=None):
     context_items = context_items or []
@@ -16,9 +26,8 @@ def answer_question(user_id, question, context_items=None):
 
     parts = []
     for item in snippets:
-        title = item["title"]
-        content = item["content"]
-        parts.append(f"[{title}]\n{content}")
+        focused = _focused_content(item["content"])
+        parts.append(f"[{item['title']}]\n{focused}")
 
     base_answer = "\n\n".join(parts)
     answer = apply_context(user_id, question, base_answer, context_items)
