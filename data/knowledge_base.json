@@ -1,22 +1,248 @@
 [
   {
     "id": "sdd-bdd-tdd",
-    "title": "SDD, BDD y TDD",
-    "content": "El curso usa SDD para disenar antes de construir, BDD para expresar comportamiento observable y TDD para escribir pruebas antes de implementar."
+    "title": "SDD, BDD y TDD en el curso",
+    "content": "En el curso usamos tres metodologias complementarias: SDD (Software Design Document) para disenar la arquitectura antes de construir, BDD (Behavior Driven Development) para expresar comportamiento observable en escenarios Gherkin, y TDD (Test Driven Development) para escribir pruebas antes del codigo de produccion. Juntas garantizan calidad, trazabilidad y diseno intencional del sistema.",
+    "doc": "sdd"
   },
   {
     "id": "rag",
-    "title": "RAG",
-    "content": "RAG recupera fragmentos de una base documental para responder con conocimiento externo al modelo."
+    "title": "RAG en el curso",
+    "content": "RAG recupera fragmentos de una base documental para responder con conocimiento externo al modelo. En el curso, RAG (Retrieval-Augmented Generation) es el mecanismo que permite al asistente buscar informacion relevante antes de generar una respuesta. El componente knowledge.py implementa el recuperador: calcula un score de coincidencia de terminos contra cada item de la base de conocimiento y devuelve los mas relevantes como contexto.",
+    "doc": "rag"
   },
   {
     "id": "cag",
-    "title": "CAG",
-    "content": "CAG usa contexto persistente, como preferencias, historial y decisiones del usuario, para mejorar respuestas futuras."
+    "title": "CAG en el curso",
+    "content": "En el curso, CAG (Context-Augmented Generation) usa contexto persistente del usuario, como preferencias, historial y decisiones, para personalizar y mejorar respuestas futuras. A diferencia de RAG que recupera conocimiento general, CAG almacena informacion especifica del usuario (nivel, estilo de explicacion, temas de interes) en el ContextStore y la inyecta en cada respuesta via apply_context.",
+    "doc": "cag"
   },
   {
     "id": "jarvis",
-    "title": "Tony Stark y Jarvis",
-    "content": "La IA debe funcionar como Jarvis: asiste y acelera, pero la persona dirige, decide y verifica."
+    "title": "IA como Jarvis — principio del curso",
+    "content": "El principio central del curso: la IA debe funcionar como Jarvis de Tony Stark — asiste, acelera y enriquece, pero la persona dirige, decide y verifica. El asistente inteligente amplifica las capacidades del usuario sin reemplazar su criterio. RAG y CAG son las dos tecnologias que hacen posible este modelo de colaboracion humano-IA.",
+    "doc": "cag"
+  },
+  {
+    "id": "sdd",
+    "title": "SDD - Software Design Document",
+    "content": "SDD - Software Design Document\n1. Introduccion\nEl Software Design Document (SDD) documenta la arquitectura, componentes, interfaces y datos del sistema antes de\nimplementar. Su proposito es garantizar vision compartida, reducir ambiguedad y habilitar trazabilidad entre requisitos y\nsolucion tecnica.\nReferencias fundacionales: 'Software Architecture in Practice' (Bass, Clements, Kazman) y 'Documenting Software\nArchitectures' (Clements et al.). Estas obras establecen el modelo de vistas multiples (modulos, componente-conector,\nasignacion) que permite a cada stakeholder obtener la informacion relevante sin saturarse.\n1.1 Vistas Arquitectonicas\n- Vista de Modulos: descomposicion en paquetes y modulos con responsabilidades claras.\n- Vista de Componentes y Conectores: interacciones en tiempo de ejecucion (HTTP, llamadas a funciones).\n- Vista de Asignacion: despliegue, mapeo a infraestructura, restricciones fisicas.\n1.2 Arquitectura del Proyecto\nEl asistente inteligente sigue una arquitectura de capas simple:\n  final_project_AI_CUSTOM/\n    backend/               # Capa de servidor\n      server.py            # HTTP server (API REST)\n      assistant.py         # Orquestador pregunta->respue",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-01",
+    "title": "SDD - Software Design Document — 1. Introduccion",
+    "content": "1. Introduccion: El Software Design Document (SDD) documenta la arquitectura, componentes, interfaces y datos del sistema antes de\nimplementar. Su proposito es garantizar vision compartida, reducir ambiguedad y habilitar trazabilidad entre requisitos y\nsolucion tecnica.\nReferencias fundacionales: 'Software Architecture in Practice' (Bass, Clements, Kazman) y 'Documenting Software\nArchitectures' (Clements et al.). Estas obras establecen el modelo de vistas multiples (modulos, componente-conector,\nasignacion) que permite a cada stakeholder obtener la informacion relevante sin saturarse.",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-02",
+    "title": "SDD - Software Design Document — 1.1 Vistas Arquitectonicas",
+    "content": "1.1 Vistas Arquitectonicas: - Vista de Modulos: descomposicion en paquetes y modulos con responsabilidades claras.\n- Vista de Componentes y Conectores: interacciones en tiempo de ejecucion (HTTP, llamadas a funciones).\n- Vista de Asignacion: despliegue, mapeo a infraestructura, restricciones fisicas.",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-03",
+    "title": "SDD - Software Design Document — 1.2 Arquitectura del Proyecto",
+    "content": "1.2 Arquitectura del Proyecto: El asistente inteligente sigue una arquitectura de capas simple: final_project_AI_CUSTOM/ backend/ # Capa de servidor server.py # HTTP server (API REST) assistant.py # Orquestador pregunta->respuesta knowledge.py # Recuperacion RAG (scoring por terminos) context_store.py # Almacen de contexto CAG (pendiente) cag.py # Integracion contexto en respuesta (pendiente) frontend/ # Interfaz web estatica index.html app.js # Cliente HTTP contra backend styles.css data/ knowledge_base.json # Base de conocimiento (4 documentos) tests/ base/ # Pruebas base (deben pasar siempre) validation/ # Pruebas de validacion (CAG contract)",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-04",
+    "title": "SDD - Software Design Document — 1.3 Decisiones Arquitectonicas Clave",
+    "content": "1.3 Decisiones Arquitectonicas Clave: ADR-01: Sin dependencias externas\nEl servidor usa la biblioteca estandar de Python (http.server, json, urllib) para eliminar la necesidad de pip install o\nentornos virtuales. Decision driven by simplicidad y portabilidad.\nADR-02: API REST sobre HTTP\nEndpoints: GET /health, POST /api/ask, GET /api/context, POST /api/context. Formato JSON con CORS habilitado para\nel frontend.\nADR-03: Separacion RAG / CAG\nknowledge.py maneja recuperacion de conocimiento general (RAG). context_store.py + cag.py manejan contexto\npersistente del usuario (CAG). Separacion limpia de responsabilidades.\nSDD - Software Design Document",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-05",
+    "title": "SDD - Software Design Document — 2. Atributos de Calidad",
+    "content": "2. Atributos de Calidad: - Mantenibilidad: modulos con una unica responsabilidad (server, assistant, knowledge, context_store).\n- Testeabilidad: servidor con puerto dinamico (port=0) para tests aislados.\n- Extensibilidad: nueva logica CAG se agrega sin tocar server.py mas que conectar los handlers.\n- Portabilidad: Python stdlib solo -> corre en cualquier SO con Python 3.8+.",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-06",
+    "title": "SDD - Software Design Document — 3. Flujo de Datos: /api/ask",
+    "content": "3. Flujo de Datos: /api/ask: Frontend --POST /api/ask {user_id, question}--> server.py -> ExamRequestHandler.do_POST() -> assistant.answer_question(user_id, question) -> knowledge.retrieve_snippets(question) # RAG -> load_knowledge_base() # Lee JSON -> scoring por terminos, top-2 -> assistant arma respuesta con sources -> devuelve JSON {answer, sources, context_used} <- JSON response --> Frontend renderiza",
+    "doc": "sdd"
+  },
+  {
+    "id": "sdd-07",
+    "title": "SDD - Software Design Document — 4. Referencias",
+    "content": "4. Referencias: Software Architecture in Practice (Bass, Clements, Kazman) - Addison-Wesley\nDocumenting Software Architectures (Clements et al.) - Addison-Wesley\nSEI - Carnegie Mellon: Software Architecture Resources\nISO/IEC 42010: Systems and software engineering - Architecture description\nACM Digital Library - 'software architecture' 'architectural decisions'\nNota: El SDD debe actualizarse cuando se implemente CAG completamente, agregando las nuevas vistas y decisiones asociadas al\nalmacen de contexto.",
+    "doc": "sdd"
+  },
+  {
+    "id": "bdd",
+    "title": "BDD - Behavior Driven Development",
+    "content": "BDD - Behavior Driven Development\n1. Introduccion\nBehavior Driven Development (BDD) es una metodologia agil que describe el comportamiento esperado del software en\nlenguaje natural estructurado. Creada por Dan North (2006), responde '?que deberia hacer el sistema?' antes de\n'?como implementarlo?'.\nReferencia principal: 'Specification by Example' (Gojko Adzic) demuestra que los ejemplos concretos son la mejor\nmanera de comunicar comportamiento entre negocio y desarrollo. 'BDD in Action' (John Ferguson Smart) es la guia\npractica de implementacion.\n1.1 Estructura Given-When-Then\n- Given: contexto inicial (precondiciones del escenario).\n- When: accion que dispara el comportamiento a probar.\n- Then: resultado esperado y verificable.\nEsta estructura fuerza a pensar en comportamiento observable, no implementacion interna. Un escenario BDD bien\nescrito es entendible por negocio y ejecutable como prueba.\n1.2 BDD en el Proyecto\nEscenarios Gherkin del asistente inteligente:\n  Feature: Asistente Inteligente\n  \n    Scenario: Pregunta con respuesta en knowledge base\n      Given el usuario \"student-01\" esta registrado\n      When pregunta \"Que es RAG?\"\n      Then el sistema responde con contenido",
+    "doc": "bdd"
+  },
+  {
+    "id": "bdd-01",
+    "title": "BDD - Behavior Driven Development — 1. Introduccion",
+    "content": "1. Introduccion: Behavior Driven Development (BDD) es una metodologia agil que describe el comportamiento esperado del software en\nlenguaje natural estructurado. Creada por Dan North (2006), responde '?que deberia hacer el sistema?' antes de\n'?como implementarlo?'.\nReferencia principal: 'Specification by Example' (Gojko Adzic) demuestra que los ejemplos concretos son la mejor\nmanera de comunicar comportamiento entre negocio y desarrollo. 'BDD in Action' (John Ferguson Smart) es la guia\npractica de implementacion.",
+    "doc": "bdd"
+  },
+  {
+    "id": "bdd-02",
+    "title": "BDD - Behavior Driven Development — 1.1 Estructura Given-When-Then",
+    "content": "1.1 Estructura Given-When-Then: - Given: contexto inicial (precondiciones del escenario).\n- When: accion que dispara el comportamiento a probar.\n- Then: resultado esperado y verificable.\nEsta estructura fuerza a pensar en comportamiento observable, no implementacion interna. Un escenario BDD bien\nescrito es entendible por negocio y ejecutable como prueba.",
+    "doc": "bdd"
+  },
+  {
+    "id": "bdd-03",
+    "title": "BDD - Behavior Driven Development — 1.2 BDD en el Proyecto",
+    "content": "1.2 BDD en el Proyecto: Escenarios Gherkin del asistente inteligente: Feature: Asistente Inteligente Scenario: Pregunta con respuesta en knowledge base Given el usuario \"student-01\" esta registrado When pregunta \"Que es RAG?\" Then el sistema responde con contenido de knowledge_base.json And la respuesta incluye la fuente \"rag\" And context_used es una lista vacia Scenario: Pregunta sin coincidencia Given el usuario \"student-01\" esta registrado When pregunta \"Que es la teoria de cuerdas?\" Then el sistema responde que no encontro informacion Scenario: Guardar contexto de usuario (CAG) Given el usuario \"ana\" tiene sesion activa When guarda contexto con key \"preferred_style\" Then el sistema responde 201 con saved=true\nBDD - Behavior Driven Development",
+    "doc": "bdd"
+  },
+  {
+    "id": "bdd-04",
+    "title": "BDD - Behavior Driven Development — 2. Cobertura de Pruebas Base",
+    "content": "2. Cobertura de Pruebas Base: Las pruebas base del proyecto validan tres escenarios fundamentales: # test_base_api.py class BaseApiTest(unittest.TestCase): def test_health_returns_ok(self): # GET /health -> 200 {\"status\": \"ok\"} status, body = self.get_json(\"/health\") self.assertEqual(status, 200) self.assertEqual(body[\"status\"], \"ok\") def test_ask_answers_from_knowledge_base(self): # POST /api/ask -> respuesta con sources status, body = self.post_json(\"/api/ask\", {\"user_id\": \"base-user\", \"question\": \"Que es RAG en el curso?\"}) self.assertEqual(status, 200) self.assertIn(\"RAG recupera\", body[\"answer\"]) self.assertIn(\"rag\", body[\"sources\"]) def test_ask_requires_user_and_question(self): # Sin question -> 400 with self.assertRaises(HTTPError) as error: self.post_json(\"/api/ask\", {\"user_id\": \"base-user\"}) self.assertEqual(error.exception.code, 400)\nEstas pruebas validan el comportamiento completo del endpoint /api/ask: c",
+    "doc": "bdd"
+  },
+  {
+    "id": "bdd-05",
+    "title": "BDD - Behavior Driven Development — 3. Pruebas de Validacion CAG",
+    "content": "3. Pruebas de Validacion CAG: Las pruebas de validacion verifican que el comportamiento CAG funcione: # test_cag_contract.py class CagContractTest(unittest.TestCase): def test_saves_context_for_user(self): # POST /api/context -> 201 {\"saved\": true} status, body = self.post_json(\"/api/context\", {\"user_id\": \"ana\", \"key\": \"preferred_style\", \"value\": \"explicaciones con analogias\"}) self.assertEqual(status, 201) self.assertTrue(body[\"saved\"]) def test_retrieves_context_for_user(self): # GET /api/context?user_id=ana -> contexto guardado status, body = self.get_json(\"/api/context?user_id=ana\") self.assertEqual(status, 200) self.assertIn({\"key\": \"project\", \"value\": ...}, body[\"context\"]) def test_ask_uses_context_to_influence_response(self): # Pregunta con contexto -> respuesta personalizada self.assertIn(\"principiante\", body[\"answer\"].lower()) self.assertIn(\"audience\", body[\"context_used\"])\nBDD - Behavior Driven Development",
+    "doc": "bdd"
+  },
+  {
+    "id": "bdd-06",
+    "title": "BDD - Behavior Driven Development — 4. Referencias",
+    "content": "4. Referencias: Specification by Example (Gojko Adzic) - Manning Publications\nBDD in Action (John Ferguson Smart) - Manning Publications\nCucumber Documentation - cucumber.io\nBehave (Python BDD) - behave.readthedocs.io\nGherkin Reference - cucumber.io/docs/gherkin",
+    "doc": "bdd"
+  },
+  {
+    "id": "tdd",
+    "title": "TDD - Test Driven Development",
+    "content": "TDD - Test Driven Development\n1. Introduccion\nTest Driven Development (TDD) es una tecnica donde las pruebas se escriben antes del codigo de produccion. Ciclo\nRed-Green-Refactor (Kent Beck, 'Test Driven Development: By Example', 2002): escribir prueba que falla (RED), codigo\nminimo para que pase (GREEN), refactorizar (REFACTOR).\n'Growing Object-Oriented Software, Guided by Tests' (Freeman & Pryce) extiende TDD a nivel de sistemas: el software\ncrece organicamente guiado por pruebas, en lugar de diseno upfront.\n1.1 El Ciclo TDD\n- RED: prueba que falla para funcionalidad aun no implementada.\n- GREEN: codigo minimo para que la prueba pase (sin optimizar).\n- REFACTOR: mejorar el codigo manteniendo todas las pruebas verdes.\n1.2 Beneficios Medibles\n- 40-80% menos bugs en produccion (estudios empiricos, Nagappan et al., 2008).\n- Diseno mas modular y desacoplado (el testing force a interfaces limpias).\n- Documentacion viva: las pruebas describen comportamiento esperado.\n- Refactoring seguro: cualquier cambio verificado al instante.\nTDD - Test Driven Development\n2. TDD Aplicado al Proyecto\n2.1 Testeo de knowledge.py (algoritmo de scoring)\nEl corazon del RAG es el scoring por terminos. TDD ex",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-01",
+    "title": "TDD - Test Driven Development — 1. Introduccion",
+    "content": "1. Introduccion: Test Driven Development (TDD) es una tecnica donde las pruebas se escriben antes del codigo de produccion. Ciclo\nRed-Green-Refactor (Kent Beck, 'Test Driven Development: By Example', 2002): escribir prueba que falla (RED), codigo\nminimo para que pase (GREEN), refactorizar (REFACTOR).\n'Growing Object-Oriented Software, Guided by Tests' (Freeman & Pryce) extiende TDD a nivel de sistemas: el software\ncrece organicamente guiado por pruebas, en lugar de diseno upfront.",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-02",
+    "title": "TDD - Test Driven Development — 1.1 El Ciclo TDD",
+    "content": "1.1 El Ciclo TDD: - RED: prueba que falla para funcionalidad aun no implementada.\n- GREEN: codigo minimo para que la prueba pase (sin optimizar).\n- REFACTOR: mejorar el codigo manteniendo todas las pruebas verdes.",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-03",
+    "title": "TDD - Test Driven Development — 1.2 Beneficios Medibles",
+    "content": "1.2 Beneficios Medibles: - 40-80% menos bugs en produccion (estudios empiricos, Nagappan et al., 2008).\n- Diseno mas modular y desacoplado (el testing force a interfaces limpias).\n- Documentacion viva: las pruebas describen comportamiento esperado.\n- Refactoring seguro: cualquier cambio verificado al instante.\nTDD - Test Driven Development",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-05",
+    "title": "TDD - Test Driven Development — 2.1 Testeo de knowledge.py (algoritmo de scoring)",
+    "content": "2.1 Testeo de knowledge.py (algoritmo de scoring): El corazon del RAG es el scoring por terminos. TDD exige probar los casos limite: class KnowledgeTest(unittest.TestCase): def test_retrieve_encuentra_coincidencia_parcial(self): resultado = retrieve_snippets(\"que es RAG\") self.assertTrue(len(resultado) > 0) self.assertIn(\"rag\", [r[\"id\"] for r in resultado]) def test_retrieve_sin_coincidencia_retorna_vacio(self): resultado = retrieve_snippets(\"zyxwvu teoria incognita\") self.assertEqual(resultado, []) def test_retrieve_respeta_limite_de_resultados(self): resultado = retrieve_snippets(\"curso\") self.assertLessEqual(len(resultado), 2)",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-06",
+    "title": "TDD - Test Driven Development — 2.2 Testeo de server.py (API REST)",
+    "content": "2.2 Testeo de server.py (API REST): class BaseApiTest(unittest.TestCase): # Ver ejemplos en BDD (seccion 2) # Los tests base ya cubren: health, ask exitoso, ask con error",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-07",
+    "title": "TDD - Test Driven Development — 2.3 Testeo de context_store.py (CAG)",
+    "content": "2.3 Testeo de context_store.py (CAG): Para implementar CAG, TDD dicta escribir estas pruebas primero: class ContextStoreTest(unittest.TestCase): def test_save_persiste_clave_valor(self): store = ContextStore() store.save(\"ana\", \"style\", \"analogias\") ctx = store.list_for_user(\"ana\") self.assertIn({\"key\": \"style\", \"value\": \"analogias\"}, ctx) def test_contexto_aislado_por_usuario(self): store = ContextStore() store.save(\"ana\", \"x\", \"1\") ctx_luis = store.list_for_user(\"luis\") self.assertEqual(ctx_luis, []) def test_sobrescribe_misma_clave(self): store = ContextStore() store.save(\"ana\", \"tema\", \"SDD\") store.save(\"ana\", \"tema\", \"BDD\") ctx = store.list_for_user(\"ana\") self.assertEqual(len(ctx), 1) self.assertEqual(ctx[0][\"value\"], \"BDD\")",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-08",
+    "title": "TDD - Test Driven Development — 3. Pir amide de Testing",
+    "content": "3. Pir amide de Testing: Proyecto sigue la piramide clasica:\n- Base: tests unitarios (knowledge, context_store) - rapidos, aislados.\n- Medio: tests de integracion (server con puerto real).\nTDD - Test Driven Development\n- Tope: tests de validacion (CAG contract) - cobertura de requisitos del examen.",
+    "doc": "tdd"
+  },
+  {
+    "id": "tdd-09",
+    "title": "TDD - Test Driven Development — 4. Referencias",
+    "content": "4. Referencias: Test Driven Development: By Example (Kent Beck) - Addison-Wesley\nGrowing Object-Oriented Software, Guided by Tests (Freeman & Pryce) - Addison-Wesley\nxUnit Test Patterns (Gerard Meszaros) - Addison-Wesley\nPytest Documentation - pytest.org\nNagappan et al., 'Realizing quality improvement through test driven development' (2008)",
+    "doc": "tdd"
+  },
+  {
+    "id": "rag-01",
+    "title": "RAG - Retrieval-Augmented Generation — 1. Introduccion",
+    "content": "1. Introduccion: Retrieval-Augmented Generation (RAG) combina recuperacion de informacion con generacion de lenguaje. En lugar de\ndepender solo del conocimiento interno del modelo (parametros), RAG recupera fragmentos relevantes de una base\ndocumental externa y los incorpora como contexto.\nPaper fundacional: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks' (Lewis et al., Facebook AI\nResearch, 2020, arXiv:2005.11401). Demostro que RAG supera a modelos puramente generativos en tasks que\nrequieren conocimiento factual: QA, verificacion de hechos, traduccion especializada.",
+    "doc": "rag"
+  },
+  {
+    "id": "rag-02",
+    "title": "RAG - Retrieval-Augmented Generation — 1.1 Arquitectura RAG",
+    "content": "1.1 Arquitectura RAG: Tres componentes:\n- Indexador: procesa y almacena documentos en formato buscable.\n- Recuperador (Retriever): selecciona fragmentos relevantes dada una consulta.\n- Generador (Generator): LLM que recibe consulta + fragmentos y produce respuesta.",
+    "doc": "rag"
+  },
+  {
+    "id": "rag-03",
+    "title": "RAG - Retrieval-Augmented Generation — 1.2 Implementacion en el Proyecto",
+    "content": "1.2 Implementacion en el Proyecto: knowledge.py implementa un recuperador por coincidencia de terminos (bag-of-words): def retrieve_snippets(question, knowledge_base=None, limit=2): knowledge_base = knowledge_base or load_knowledge_base() terms = set(question.lower() .replace(\"?\", \"\").replace(\",\", \"\").split()) scored = [] for item in knowledge_base: haystack = f\"{item['title']} {item['content']}\".lower() score = sum(1 for term in terms if term in haystack) if score > 0: scored.append((score, item)) scored.sort(key=lambda pair: pair[0], reverse=True) return [item for _, item in scored[:limit]]\nBase de conocimiento actual (knowledge_base.json): [ {\"id\": \"sdd-bdd-tdd\", \"title\": \"SDD, BDD y TDD\", \"content\": \"El curso usa SDD para disenar antes de construir...\"}, {\"id\": \"rag\", \"title\": \"RAG\", \"content\": \"RAG recupera fragmentos de una base documental...\"}, {\"id\": \"cag\", \"title\": \"CAG\", \"content\": \"CAG usa contexto persistente.",
+    "doc": "rag"
+  },
+  {
+    "id": "rag-04",
+    "title": "RAG - Retrieval-Augmented Generation — 2. Variantes de RAG",
+    "content": "2. Variantes de RAG: - RAG Secuencial: recuperar primero, generar despues (enfoque clasico, usado en el proyecto).\n- RAG Iterativo: multiples ciclos recuperacion-generacion para preguntas complejas.\n- RAG con Memoria: incorpora historial de conversacion en la consulta de recuperacion.\n- RAG Hibrido: combina busqueda semantica (vectores/embeddings) con busqueda lexica (BM25).\nEl proyecto implementa RAG secuencial. Para RAG hibrido se podria integrar Ollama con embeddings (nomic-embed-text) en el\nrecuperador.",
+    "doc": "rag"
+  },
+  {
+    "id": "rag-05",
+    "title": "RAG - Retrieval-Augmented Generation — 3. Evaluacion de RAG",
+    "content": "3. Evaluacion de RAG: - Exact Match (EM): porcentaje de respuestas que coinciden exactamente con el gold standard.\n- F1 Score: promedio ponderado de precision y recall a nivel de tokens.\n- Faithfulness: que tan fiel es la respuesta a los fragmentos recuperados (evita alucinaciones).\n- Answer Relevance: que tan relevante es la respuesta para la pregunta original.\nPara este proyecto, las pruebas base verifican que la respuesta CONTENGA el fragmento esperado (assertIn),\nvalidando faithfulness implicita.",
+    "doc": "rag"
+  },
+  {
+    "id": "rag-06",
+    "title": "RAG - Retrieval-Augmented Generation — 4. Referencias",
+    "content": "4. Referencias: RAG Paper: Lewis et al. (2020) - arXiv:2005.11401\nDesigning Machine Learning Systems (Chip Huyen) - O'Reilly\nLangChain RAG Documentation - python.langchain.com\nGoogle Scholar - Retrieval-Augmented Generation\nRAGAS (RAG Assessment) - docs.ragas.io",
+    "doc": "rag"
+  },
+  {
+    "id": "cag-01",
+    "title": "CAG - Context-Augmented Generation — 1. Introduccion",
+    "content": "1. Introduccion: Context-Augmented Generation (CAG) es la evolucion conceptual de RAG que enfatiza contexto persistente y\nestructurado del USUARIO (no conocimiento general). Mientras RAG recupera de una base documental general, CAG\nincorpora preferencias, historial y decisiones del usuario para personalizar respuestas.\nCAG no tiene un paper fundacional unico. Su fundamento teorico se encuentra en 'Building LLM Powered Applications'\n(Valentina Alto, O'Reilly) y 'Design Patterns for Large Language Models' (O'Reilly). Estas obras documentan patrones\nde memoria: episodica (conversaciones pasadas), semantica (perfil del usuario) y de trabajo (estado actual de la\nsesion).",
+    "doc": "cag"
+  },
+  {
+    "id": "cag-02",
+    "title": "CAG - Context-Augmented Generation — 1.1 RAG vs CAG",
+    "content": "1.1 RAG vs CAG: - RAG: conocimiento publico/general desde base documental estatica.\n- CAG: contexto privado/especifico del usuario, dinamico durante la interaccion.\n- RAG responde factualmente; CAG personaliza segun el usuario.\nCAG - Context-Augmented Generation",
+    "doc": "cag"
+  },
+  {
+    "id": "cag-03",
+    "title": "CAG - Context-Augmented Generation — 2. Estado Actual en el Proyecto",
+    "content": "2. Estado Actual en el Proyecto: context_store.py (placeholder - PENDIENTE de implementar): class ContextStore: def save(self, user_id, key, value): raise NotImplementedError(\"CAG context storage is not implemented yet\") def list_for_user(self, user_id): raise NotImplementedError(\"CAG context retrieval is not implemented yet\")\ncag.py (placeholder - PENDIENTE de implementar): def apply_context(user_id, question, base_answer, context_items): return base_answer",
+    "doc": "cag"
+  },
+  {
+    "id": "cag-04",
+    "title": "CAG - Context-Augmented Generation — 2.1 Lo Que el Examen Pide Implementar",
+    "content": "2.1 Lo Que el Examen Pide Implementar: Segun las pruebas de validacion (test_cag_contract.py), CAG debe:\n- POST /api/context -> guardar clave-valor por usuario (status 201, saved=true).\n- GET /api/context?user_id=X -> recuperar contexto (status 200, lista de items).\n- POST /api/ask con contexto previo -> respuesta influenciada por contexto (context_used con la clave).",
+    "doc": "cag"
+  },
+  {
+    "id": "cag-05",
+    "title": "CAG - Context-Augmented Generation — 2.2 Estrategia de Implementacion Sugerida",
+    "content": "2.2 Estrategia de Implementacion Sugerida: Paso 1: context_store.py - almacen en memoria class ContextStore: def __init__(self): self._data = {} # {user_id: {key: value}} def save(self, user_id, key, value): if user_id not in self._data: self._data[user_id] = {} self._data[user_id][key] = value return True def list_for_user(self, user_id): items = self._data.get(user_id, {}) return [{\"key\": k, \"value\": v} for k, v in items.items()]\nPaso 2: cag.py - inyectar contexto en respuesta def apply_context(user_id, question, base_answer, context_items): if not context_items: return base_answer ctx_str = \"; \".join( f\"{c['key']}: {c['value']}\" for c in context_items) return f\"{base_answer} [Contexto: {ctx_str}]\"",
+    "doc": "cag"
+  },
+  {
+    "id": "cag-06",
+    "title": "CAG - Context-Augmented Generation — 3. Patrones de Memoria para CAG",
+    "content": "3. Patrones de Memoria para CAG: - Memoria Episodica: historial de preguntas y respuestas anteriores del usuario.\n- Memoria Semantica: preferencias del usuario (nivel, formato, temas de interes).\n- Memoria de Trabajo: estado transitorio de la sesion actual.\nPara una implementacion completa, context_store podria persistir a disco (JSON/ SQLite) en lugar de solo memoria volatil.\nCAG - Context-Augmented Generation",
+    "doc": "cag"
+  },
+  {
+    "id": "cag-07",
+    "title": "CAG - Context-Augmented Generation — 4. Referencias",
+    "content": "4. Referencias: Building LLM Powered Applications (Valentina Alto) - O'Reilly\nDesign Patterns for Large Language Models - O'Reilly\nACM Digital Library - 'context aware systems', 'software traceability'\narXiv - LLM Context & Memory\nO'Reilly - LLM Architecture and Design Patterns",
+    "doc": "cag"
   }
 ]

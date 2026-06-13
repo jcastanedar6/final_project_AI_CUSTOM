@@ -9,13 +9,18 @@ def answer_question(user_id, question, context_items=None):
     if not snippets:
         return {
             "user_id": user_id,
-            "answer": "No encontre informacion suficiente en la base de conocimiento del curso.",
+            "answer": "No encontre informacion suficiente en la base de conocimiento del curso sobre ese tema.",
             "sources": [],
             "context_used": [],
         }
 
-    source_text = " ".join(item["content"] for item in snippets)
-    base_answer = f"Segun la base de conocimiento del curso: {source_text}"
+    parts = []
+    for item in snippets:
+        title = item["title"]
+        content = item["content"]
+        parts.append(f"[{title}]\n{content}")
+
+    base_answer = "\n\n".join(parts)
     answer = apply_context(user_id, question, base_answer, context_items)
 
     return {
