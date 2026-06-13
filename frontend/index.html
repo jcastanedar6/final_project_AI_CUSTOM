@@ -27,15 +27,25 @@
 
         <aside class="card context-card">
           <p class="panel-label">Panel CAG</p>
-          <h2>Contexto pendiente</h2>
-          <p>Este panel es un punto de partida. Debe mostrar contexto guardado cuando implementes <code>/api/context</code>.</p>
-          <pre id="context-output">Sin contexto cargado.</pre>
+          <h2 id="context-title">Contexto</h2>
+
+          <form id="context-form" class="context-form">
+            <div class="context-form-row">
+              <input id="ctx-key" name="key" placeholder="clave" />
+              <input id="ctx-value" name="value" placeholder="valor" />
+              <button type="submit" class="btn-save">Guardar</button>
+            </div>
+          </form>
+
+          <div id="context-output" class="context-list">
+            <p class="context-empty">Sin contexto guardado.</p>
+          </div>
         </aside>
       </section>
 
-      <section class="card response-card">
+      <section class="card response-card" id="response-card">
         <p class="panel-label">Respuesta</p>
-        <pre id="answer-output">Todavia no hiciste una pregunta.</pre>
+        <div id="answer-output" class="answer-placeholder">Todavia no hiciste una pregunta.</div>
       </section>
     </main>
 
