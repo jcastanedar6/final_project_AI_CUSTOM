@@ -65,8 +65,13 @@ def retrieve_snippets(question, knowledge_base=None, limit=4):
     # High-confidence match: return fewer, more focused chunks
     effective_limit = 2 if top_score >= 0.6 else limit
     max_per_doc = 1 if top_score >= 0.6 else 2
-    # Drop low-relevance results when a strong match exists
     min_score = top_score * 0.5
+
+    # If any domain-specific chunk scores well, skip cross-topic meta anchors
+    has_domain_match = any(
+        score >= 0.6 and item.get("doc", item["id"]) != "meta"
+        for score, item in scored
+    )
 
     seen_docs = {}
     result = []
@@ -74,6 +79,8 @@ def retrieve_snippets(question, knowledge_base=None, limit=4):
         if score < min_score:
             break
         doc = item.get("doc", item["id"])
+        if has_domain_match and doc == "meta":
+            continue
         count = seen_docs.get(doc, 0)
         if count < max_per_doc:
             result.append(item)

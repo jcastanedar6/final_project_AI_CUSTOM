@@ -3,7 +3,7 @@
     "id": "sdd-bdd-tdd",
     "title": "SDD, BDD y TDD en el curso",
     "content": "En el curso usamos tres metodologias complementarias: SDD (Software Design Document) para disenar la arquitectura antes de construir, BDD (Behavior Driven Development) para expresar comportamiento observable en escenarios Gherkin, y TDD (Test Driven Development) para escribir pruebas antes del codigo de produccion. Juntas garantizan calidad, trazabilidad y diseno intencional del sistema.",
-    "doc": "sdd"
+    "doc": "meta"
   },
   {
     "id": "rag",
@@ -21,7 +21,7 @@
     "id": "jarvis",
     "title": "IA como Jarvis — principio del curso",
     "content": "El principio central del curso: la IA debe funcionar como Jarvis de Tony Stark — asiste, acelera y enriquece, pero la persona dirige, decide y verifica. El asistente inteligente amplifica las capacidades del usuario sin reemplazar su criterio. RAG y CAG son las dos tecnologias que hacen posible este modelo de colaboracion humano-IA.",
-    "doc": "cag"
+    "doc": "meta"
   },
   {
     "id": "sdd",
