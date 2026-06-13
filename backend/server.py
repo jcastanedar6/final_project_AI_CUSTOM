@@ -96,11 +96,11 @@ class ExamRequestHandler(BaseHTTPRequestHandler):
         return
 
 
-def create_server(host="127.0.0.1", port=8000):
+def create_server(host="127.0.0.1", port=8030):
     return ThreadingHTTPServer((host, port), ExamRequestHandler)
 
 
 if __name__ == "__main__":
     server = create_server()
-    print("Backend running at http://127.0.0.1:8000")
+    print("Backend running at http://127.0.0.1:8030")
     server.serve_forever()

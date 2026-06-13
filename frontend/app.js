@@ -2,7 +2,7 @@ const askForm = document.querySelector("#ask-form");
 const answerOutput = document.querySelector("#answer-output");
 const contextOutput = document.querySelector("#context-output");
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "http://127.0.0.1:8030";
 
 askForm.addEventListener("submit", async (event) => {
   event.preventDefault();
