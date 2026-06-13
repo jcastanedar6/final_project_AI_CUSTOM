@@ -105,7 +105,7 @@ Por qué: si la base vectorial se recalcula en cada equipo, los embeddings puede
 
 ---
 
-### P-10 — Clonado, setup y cambio de puerto
+### P-10 — Clonado, setup y cambio de puerto (OPEN CODE)
 
 **Objetivo:** Clonar el proyecto fork en esta PC, hacerlo correr y cambiar el puerto del backend.
 
