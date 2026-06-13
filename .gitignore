@@ -41,3 +41,4 @@ Thumbs.db
 generate_docx.py
 .atl/
 PROMPTS.md
+!docs/evidencias/*.docx
